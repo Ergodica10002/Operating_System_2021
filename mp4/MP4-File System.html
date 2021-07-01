@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<!-- saved from url=(0068)https://operatingsystemsatntu.github.io/OS-21-Spring-at-NTU/mp4.html -->
+<html lang="en-US"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    
+    
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>MP 4: File System | OS-21-Spring-at-NTU</title>
+<meta name="generator" content="Jekyll v3.9.0">
+<meta property="og:title" content="MP 4: File System">
+<meta property="og:locale" content="en_US">
+<meta name="description" content="Github Course Site for Operating Systems 2021 at National Taiwan University">
+<meta property="og:description" content="Github Course Site for Operating Systems 2021 at National Taiwan University">
+<link rel="canonical" href="https://operatingsystemsatntu.github.io/OS-21-Spring-at-NTU/mp4.html">
+<meta property="og:url" content="https://operatingsystemsatntu.github.io/OS-21-Spring-at-NTU/mp4.html">
+<meta property="og:site_name" content="OS-21-Spring-at-NTU">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="MP 4: File System">
+<script type="application/ld+json">
+{"description":"Github Course Site for Operating Systems 2021 at National Taiwan University","url":"https://operatingsystemsatntu.github.io/OS-21-Spring-at-NTU/mp4.html","@type":"WebPage","headline":"MP 4: File System","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="./MP4-File System_files/style.css">
+  </head>
+  <body class="vsc-initialized">
+    <a id="skip-to-content" href="https://operatingsystemsatntu.github.io/OS-21-Spring-at-NTU/mp4.html#content">Skip to the content.</a>
+
+    <header class="page-header" role="banner">
+      <h1 class="project-name">Operating System 2021 Machine Problem Site</h1>
+      <h2 class="project-tagline">The site provides the information for machine problems for Operating System Course offered in Spring 2021 at National Taiwan University</h2>
+    </header>
+
+    <main id="content" class="main-content" role="main">
+      <h1 id="mp-4-file-system">MP 4: File System</h1>
+
+<p>In this MP, you will learn the fundamental knowledge of file system by adding two features to xv6: large files and symbolic links.</p>
+
+<h2 id="deadline">Deadline</h2>
+<ul>
+  <li>2021/06/14 23:59</li>
+  <li>No early bird</li>
+  <li>No late submission</li>
+</ul>
+
+<h2 id="set-up">Set Up</h2>
+<p>We provide the whole xv6 code you need for this MP. All the necessary files are given, and you only need to modify the missing parts. The following instructions will help you complete the set up.</p>
+
+<ol>
+  <li>
+    <p>Download xv6 code from github classroom.</p>
+  </li>
+  <li>Pull docker image
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nv">$ </span>docker pull ntuos/mp4
+</code></pre></div>    </div>
+  </li>
+  <li>Run the image and mount the directory
+The command below create a container from the image, and mount the xv6 code to it. Then, you directly interact with it via its shell.
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nv">$ </span><span class="nb">cd</span> &lt;xv6_directory&gt;
+ <span class="nv">$ </span>docker run <span class="nt">-it</span> <span class="nt">--name</span> &lt;CONTAINER_NAME&gt; <span class="nt">-v</span> <span class="s2">"</span><span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span><span class="s2">"</span>:/home/mp4 ntuos/mp4
+</code></pre></div>    </div>
+  </li>
+  <li>Run xv6.
+ Inside the container you run the command below. If everything is fine, then you are able to start up the xv6 now.
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="o">(</span>container<span class="o">)</span><span class="nv">$ </span><span class="nb">cd</span> /home/mp4
+ <span class="o">(</span>container<span class="o">)</span><span class="nv">$ </span>make qemu
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<p>If xv6 starts up successfully, congrats! Now you can start to play with MP4.</p>
+
+<h2 id="reminders">Reminders</h2>
+<p>⭐️  We strongly recommend you read Chapter 8 (file system) in xv6 hand book while you trace code. This gives you a quick overview of how xv6 implement its file system.</p>
+
+<h2 id="problems">Problems</h2>
+<h3 id="1-large-files-4-points">1. Large Files (4 points)</h3>
+<h4 id="preliminaries">Preliminaries</h4>
+<p>Change the <code class="language-plaintext highlighter-rouge">FSSIZE</code> in <code class="language-plaintext highlighter-rouge">kernel/param.h</code> to 200000. This parameter controls the total number of blocks in xv6.</p>
+
+<h4 id="description">Description</h4>
+<p>In this problem you’ll increase the maximum size of an xv6 file. Currently xv6 files are limited to 268 blocks, or 268*BSIZE bytes (BSIZE is 1024 bits in xv6). This limitation comes from the fact that an xv6 inode contains 12 “direct” block numbers and one “singly-indirect” block number, which refers to a block that holds up to 256 more block numbers, for a total of 12+256=268 blocks.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">bigfile</code> command creates the longest file it can, and reports the size. The command is already there, so you can try to run:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>bigfile
+..
+wrote 268 blocks
+bigfile: file is too small
+</code></pre></div></div>
+
+<p>The test fails because <code class="language-plaintext highlighter-rouge">bigfile</code> expects to create a file with 66666 blocks, but unmodified xv6 limits files to 268 blocks.</p>
+
+<p>Your task is to change the xv6 file system code to support large files. <strong>You need to implement “doubly-indirect” blocks</strong>, containing 256 addresses of singly-indirect blocks, each of which can contain up to 256 addresses of data blocks. By modifying one direct block into a “doubly-indirect” block, a file will be able to consist of up to 65803 blocks (256 x 256 + 256 + 11). It is 11 because we have to sacrifice one direct block number for doubly-indirect block.</p>
+
+<p>It is still not sufficient to accomplish our goal. You will need to implement an extra indirect block to achieve 66666 blocks.</p>
+
+<p>⚠️ <code class="language-plaintext highlighter-rouge">bigfile</code> may take a couple of minutes to run.</p>
+<h4 id="test-you-code">Test You Code</h4>
+<p>You can use <code class="language-plaintext highlighter-rouge">bigfile</code> to test your code. If you are able to get the following output, then you are done in this part.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>bigfile
+..................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
+wrote 66666 blocks
+<span class="k">done</span><span class="p">;</span> ok
+</code></pre></div></div>
+
+<h4 id="where-to-start--hints">Where to Start &amp; Hints</h4>
+<ol>
+  <li>Checkout TODOs in the skeleton code.</li>
+  <li><code class="language-plaintext highlighter-rouge">kernel/fs.h</code> describes the structure of an on-disk inode. The address of data block is stored in addrs. Note that the length of addrs is always 13.</li>
+  <li>Make sure you understand <code class="language-plaintext highlighter-rouge">bmap()</code>. Write out a diagram of the relationships between <code class="language-plaintext highlighter-rouge">ip-&gt;addrs[]</code>, the indirect block, the doubly-indirect block and the singly-indirect blocks it points to, and data blocks. Make sure you understand why adding a doubly-indirect block increases the maximum file size by 256*256-1 blocks.</li>
+  <li>If you change the definition of <code class="language-plaintext highlighter-rouge">NDIRECT</code>, you’ll probably have to change the declaration of <code class="language-plaintext highlighter-rouge">addrs[]</code> in struct inode in <code class="language-plaintext highlighter-rouge">file.h</code>. Make sure that struct inode and struct dinode have the same number of elements in their <code class="language-plaintext highlighter-rouge">addrs[]</code> arrays.</li>
+  <li>If you change the definition of NDIRECT, make sure to run <code class="language-plaintext highlighter-rouge">make clean</code> to delete fs.img. Then run <code class="language-plaintext highlighter-rouge">make qemu</code> to create a new fs.img, since mkfs uses NDIRECT to build the file system.</li>
+  <li>Don’t forget to <code class="language-plaintext highlighter-rouge">brelse()</code> each block that you <code class="language-plaintext highlighter-rouge">bread()</code>.</li>
+  <li>You should allocate indirect blocks and doubly-indirect blocks only as needed, like the original <code class="language-plaintext highlighter-rouge">bmap()</code>.</li>
+  <li>Make sure <code class="language-plaintext highlighter-rouge">itrunc()</code> frees all blocks of a file, including double-indirect blocks.</li>
+  <li>You can pass by only modifying:
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">fs.c</code></li>
+      <li><code class="language-plaintext highlighter-rouge">fs.h</code></li>
+      <li><code class="language-plaintext highlighter-rouge">file.h</code></li>
+    </ul>
+  </li>
+</ol>
+
+<h3 id="2-symbolic-links-to-files-4-points">2. Symbolic Links to Files (4 points)</h3>
+<h4 id="description-1">Description</h4>
+<p>In this exercise you will add symbolic links to xv6. Symbolic links (or soft links) refer to a linked file by pathname; when a symbolic link is opened, the kernel follows the link to the referred file. Symbolic links resembles hard links, but hard links are restricted to pointing to file on the same disk, while symbolic links can cross disk devices. Although xv6 doesn’t support multiple devices, implementing this system call is a good exercise to understand how pathname lookup works.</p>
+
+<p>You will implement the <code class="language-plaintext highlighter-rouge">symlink(char *target, char *path)</code> system call, which creates a new symbolic link at <code class="language-plaintext highlighter-rouge">path</code> that refers to a file named <code class="language-plaintext highlighter-rouge">target</code>.</p>
+
+<p>In addition, you also need to handle <code class="language-plaintext highlighter-rouge">open</code> when encountering symbolic links. When a process specifies <code class="language-plaintext highlighter-rouge">O_NOFOLLOW</code> flags, <code class="language-plaintext highlighter-rouge">open</code> should open symlinks (not targets). If the target is also a symbolic link, you must recursively follow it until a non-link file is reached. If the links form a cycle, you must return an error code. You may approximate this by returning an error code if the depth of links reaches some threshold (e.g., 10).</p>
+
+<h4 id="test-you-code-1">Test You Code</h4>
+<p>You can use <code class="language-plaintext highlighter-rouge">symlinktest</code> to test your code. If you are able to get the following output, then you are done in this part.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>symlinktest
+...
+Start: <span class="nb">test </span>symlinks
+<span class="nb">test </span>symlinks: ok
+Start: <span class="nb">test </span>concurrent symlinks
+<span class="nb">test </span>concurrent symlinks: ok
+...
+</code></pre></div></div>
+
+<h4 id="where-to-start--hints-1">Where to Start &amp; Hints</h4>
+<ol>
+  <li>Checkout TODOs in the skeleton code.</li>
+  <li>Checkout <code class="language-plaintext highlighter-rouge">kernel/sysfile.c</code>. There is an unimplemented function <code class="language-plaintext highlighter-rouge">sys_symlink</code>. Note that system call <code class="language-plaintext highlighter-rouge">symlink</code> is already added in xv6, so you don’t need to worry about that.</li>
+  <li>Checkout <code class="language-plaintext highlighter-rouge">user/symlinktest.c</code>. We will use it for grading, so test your code by running it.</li>
+  <li>Checkout <code class="language-plaintext highlighter-rouge">kernel/stat.h</code>. There is a new file type <code class="language-plaintext highlighter-rouge">T_SYMLINK</code>, which represents a symbolic link.</li>
+  <li>Checkout <code class="language-plaintext highlighter-rouge">kernel/fcntl.h</code>. There is a new flag <code class="language-plaintext highlighter-rouge">O_NOFOLLOW</code> that can be used with the open system call.</li>
+  <li>The target does not need to exist for the system call to succeed.</li>
+  <li>You will need to store the target path in a symbolic link file, for example, in inode data blocks.</li>
+  <li><code class="language-plaintext highlighter-rouge">symlink</code> should return an integer representing success (0) or failure (-1) similar to link and unlink.</li>
+  <li>Modify the <code class="language-plaintext highlighter-rouge">open</code> system call to handle paths with symbolic links. If the file does not exist, open must fail.</li>
+  <li>Don’t worry about other system calls (e.g., <code class="language-plaintext highlighter-rouge">link</code> and <code class="language-plaintext highlighter-rouge">unlink</code>). They must not follow symbolic links; these system calls operate on the symbolic link itself.</li>
+  <li>You do not have to handle symbolic links to directories for this part.</li>
+  <li>You can pass by only modifying:
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">sysfile.c</code></li>
+    </ul>
+  </li>
+</ol>
+
+<h3 id="3-symbolic-links-to-directories-2-points">3. Symbolic Links to Directories (2 points)</h3>
+<h4 id="description-2">Description</h4>
+<p>Instead of just implementing symbolic links to files, now you should also consider symbolic links to directories. We expect that a symbolic link to a directory should have these properties:</p>
+<ol>
+  <li>It can be a part of a path, and will redirect to what it links to.</li>
+  <li>You can <code class="language-plaintext highlighter-rouge">cd</code> a symbolic link if it links to a directory.</li>
+</ol>
+
+<p>For example, <code class="language-plaintext highlighter-rouge">symlink("/y/", "/x/a")</code> creates a symbolic link <code class="language-plaintext highlighter-rouge">/x/a</code> links to <code class="language-plaintext highlighter-rouge">/y/</code>. The actual path of <code class="language-plaintext highlighter-rouge">/x/a/b</code> should be <code class="language-plaintext highlighter-rouge">/y/b</code>. Thus, if you write to <code class="language-plaintext highlighter-rouge">/x/a/b</code>, yo actually write to  <code class="language-plaintext highlighter-rouge">/y/b</code>. Also, if you <code class="language-plaintext highlighter-rouge">cd</code> in to <code class="language-plaintext highlighter-rouge">/x/a</code>, your working directory should become <code class="language-plaintext highlighter-rouge">/y/</code>.</p>
+
+<p>You can check <code class="language-plaintext highlighter-rouge">testsymlinkdir</code> function in <code class="language-plaintext highlighter-rouge">symlinktest.c</code>. You will get this bonus point if you pass all tests.</p>
+
+<h4 id="test-you-code-2">Test You Code</h4>
+<p>You can use <code class="language-plaintext highlighter-rouge">symlinktest</code> to test your code. If you are able to get the following output, then you are done in this part.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>symlinktest
+...
+Start: <span class="nb">test </span>symlinks to directory
+<span class="nb">test </span>symlinks to directory: ok
+...
+</code></pre></div></div>
+
+<h4 id="where-to-start--hints-2">Where to Start &amp; Hints</h4>
+<ol>
+  <li>Checkout TODOs in the skeleton code.</li>
+  <li>You can leave <code class="language-plaintext highlighter-rouge">sys_symlink</code> function unchanged, since symbolic links store path as a string. There is no difference between a file path and a directory path.</li>
+  <li>You have to handle paths that consist of symbolic links. Check <code class="language-plaintext highlighter-rouge">namex</code> function in <code class="language-plaintext highlighter-rouge">fs.c</code>.</li>
+  <li>You may want to handle symbolic links in <code class="language-plaintext highlighter-rouge">sys_chdir</code> function.</li>
+  <li>You can pass by only modifying:
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">sysfile.c</code></li>
+      <li><code class="language-plaintext highlighter-rouge">fs.c</code></li>
+    </ul>
+  </li>
+</ol>
+
+<h3 id="4-report-1-point">4. Report (1 point)</h3>
+<p>Your report should include two parts:</p>
+<ol>
+  <li>Briefly explain how you solve each problem.
+    <ol>
+      <li>Problem 1: Large files</li>
+      <li>Problem 2: Symbolic links to files</li>
+      <li>Problem 3: Symbolic links to directories</li>
+    </ol>
+  </li>
+  <li>As mentioned in the first lecture, we encouraged you to help other students. Please describe how you helped other students here. You should make the descriptions as short as possible, but you should also make them as concrete as possible (e.g., you can screenshot how you answered other students’ questions on NTU COOL).
+Please note that you will not get any penalty if you leave empty here. Please also note that this bonus is not for you to do optimization, so we will not release the grading criteria and the grades. Regarding the final letter grades, it is very likely that this does not help — you will get promoted to the next level only if you are near the boundary of levels and you have significant contributions.</li>
+</ol>
+
+<p>The report should follow these format:</p>
+<ul>
+  <li>Should be a PDF.</li>
+  <li>Do not exceed two pages for the first part.</li>
+  <li>Do not exceed two pages for the second part either.</li>
+</ul>
+
+<h2 id="submit-rules">Submit Rules</h2>
+<ul>
+  <li>Submit <code class="language-plaintext highlighter-rouge">xv6/</code> to github classroom.
+    <ul>
+      <li>Do not submit files generated by <code class="language-plaintext highlighter-rouge">Makefile</code>. You should <code class="language-plaintext highlighter-rouge">make clean</code> before you submit.</li>
+    </ul>
+  </li>
+  <li>Submit report to gradescope <strong>MP4 Report</strong>.</li>
+</ul>
+
+<h2 id="grading-policy">Grading Policy</h2>
+<p>Total (11 points):</p>
+<ul>
+  <li>Large Files (4 points)</li>
+  <li>Symbolic links to Files (4 points)</li>
+  <li>Symbolic links to Directories (2 points)</li>
+  <li>Report (1 point)</li>
+</ul>
+
+<p>How we will grade your code:</p>
+<ul>
+  <li>We will use the original <code class="language-plaintext highlighter-rouge">Makefile</code>. If you add any file or modify the structure of <code class="language-plaintext highlighter-rouge">xv6</code>, make sure it performs the same with the original <code class="language-plaintext highlighter-rouge">Makefile</code>. (We strongly recommend you keep it simple.)</li>
+  <li>We will slightly modify the output of <code class="language-plaintext highlighter-rouge">bigfile.c</code> and <code class="language-plaintext highlighter-rouge">symlinktest.c</code> to prevent naive printing.</li>
+  <li>Three problems will be graded by the same code, so you should handle them at the same time.</li>
+  <li>To maintain grading consistency, please do not add or install any other packages outside the xv6.  Otherwise, you should make sure your code perform the same in the original environment.</li>
+  <li>You will get all points for each subproblem if you pass the testing commands. Otherwise, you don’t get any point.</li>
+</ul>
+
+<p>How we will grade your report:</p>
+<ul>
+  <li>If your solutions are reasonable and correct, you get the following point:
+    <ul>
+      <li>Problem 1: Large files (0.4 point)</li>
+      <li>Problem 2: Symbolic links to files (0.3 point)</li>
+      <li>Problem 3: Symbolic links to directories (0.3 point)</li>
+    </ul>
+  </li>
+  <li>Note that even if you fail on the implementation, you still can get points if your reports are good.</li>
+</ul>
+
+<p>For example, you pass <strong>Large Files</strong> (4) and <strong>Symbolic Links to Files</strong> (4), but you fail on <strong>Symbolic Links to Directories</strong> (0). You still hand in a complete <strong>Report</strong> (0.4+0.3+0.3). In this case, you get 9 points.</p>
+
+<h2 id="ta-hour-and-discussion">TA Hour and Discussion</h2>
+<p>If you have any question, there are two ways to ask:</p>
+<ul>
+  <li>NTU COOL Discussion (Recommended)</li>
+  <li>TA Hour
+    <ul>
+      <li>6/4 10:30 ~ 11:30 (meet.google.com/iut-ofma-ykk)</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Empirically, the efficiency of online TA hour is uncertain. We will host a short TA hour first. If the effect is good, then we may host additional TA hours. No matter what, we still strongly recommend you post your questions on NTU COOL.</p>
+
+
+
+      <footer class="site-footer">
+        
+          <p class="copyright">Operating System 2021 Machine Problem Site maintained by <a href="https://github.com/OperatingSystemsAtNTU">OperatingSystemsAtNTU</a></p>
+        
+      </footer>
+    </main>
+  
+
+
+</body></html>

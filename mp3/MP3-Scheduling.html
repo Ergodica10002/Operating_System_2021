@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<!-- saved from url=(0068)https://operatingsystemsatntu.github.io/OS-21-Spring-at-NTU/mp3.html -->
+<html lang="en-US"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    
+    
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>OS mp3 Scheduling (Due 5/24 23:59. No late submission) | OS-21-Spring-at-NTU</title>
+<meta name="generator" content="Jekyll v3.9.0">
+<meta property="og:title" content="OS mp3 Scheduling (Due 5/24 23:59. No late submission)">
+<meta property="og:locale" content="en_US">
+<meta name="description" content="Github Course Site for Operating Systems 2021 at National Taiwan University">
+<meta property="og:description" content="Github Course Site for Operating Systems 2021 at National Taiwan University">
+<link rel="canonical" href="https://operatingsystemsatntu.github.io/OS-21-Spring-at-NTU/mp3.html">
+<meta property="og:url" content="https://operatingsystemsatntu.github.io/OS-21-Spring-at-NTU/mp3.html">
+<meta property="og:site_name" content="OS-21-Spring-at-NTU">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="OS mp3 Scheduling (Due 5/24 23:59. No late submission)">
+<script type="application/ld+json">
+{"description":"Github Course Site for Operating Systems 2021 at National Taiwan University","url":"https://operatingsystemsatntu.github.io/OS-21-Spring-at-NTU/mp3.html","@type":"WebPage","headline":"OS mp3 Scheduling (Due 5/24 23:59. No late submission)","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="./Mp3-Scheduling_files/style.css">
+  </head>
+  <body class="vsc-initialized">
+    <a id="skip-to-content" href="https://operatingsystemsatntu.github.io/OS-21-Spring-at-NTU/mp3.html#content">Skip to the content.</a>
+
+    <header class="page-header" role="banner">
+      <h1 class="project-name">Operating System 2021 Machine Problem Site</h1>
+      <h2 class="project-tagline">The site provides the information for machine problems for Operating System Course offered in Spring 2021 at National Taiwan University</h2>
+    </header>
+
+    <main id="content" class="main-content" role="main">
+      <h1 id="os-mp3-scheduling-due-524-2359-no-late-submission">OS mp3 Scheduling (Due 5/24 23:59. No late submission)</h1>
+
+<p>In this mp you will have to implement CPU scheduling with the algorithms below.</p>
+
+<p>given processes</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Process</th>
+      <th>CPU burst time</th>
+      <th>Arrival Time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>P1</td>
+      <td>6</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>P2</td>
+      <td>3</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>P3</td>
+      <td>8</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>P4</td>
+      <td>3</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td>P5</td>
+      <td>4</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="first-come-first-servedfcfs">First Come First Served(FCFS):</h3>
+<p>FCFS executes queued requests and processes in order of their arrival. Thus the order of the execution of the above mentioned processes will be 
+ <img src="./Mp3-Scheduling_files/qlqZgkX.png" alt=""></p>
+
+<h3 id="round-robinrr">Round Robin(RR):</h3>
+<p>In Round-robin scheduling, each ready task runs turn by turn only in a cyclic queue for a limited time slice. This algorithm is preemptive also offers starvation free execution of processes. Thus assume time quantum for the example above is 3 the order of the execution of the above mentioned processes will be 
+<img src="./Mp3-Scheduling_files/fMjEcf9.png" alt=""></p>
+
+<h3 id="non-preemptive-shortest-job-firstsjf">Non-Preemptive Shortest Job First(SJF):</h3>
+<p>Shortest Job First (SJF) is an algorithm in which the process having the smallest execution time is chosen for the next execution. In non-preemptive scheduling, once the CPU cycle is allocated to process, the process holds it till it reaches a waiting state or terminated.Thus the order of the execution of the above mentioned processes will be 
+<img src="./Mp3-Scheduling_files/u0fEUJn.png" alt=""></p>
+
+<h3 id="shortest-remaining-time-first-preemptive-sjf">Shortest Remaining Time First (Preemptive SJF)</h3>
+<p>In the Shortest Remaining Time First (SRTF) scheduling algorithm, the process with the smallest amount of time remaining until completion is selected to execute. Since the currently executing process is the one with the shortest amount of time remaining by definition, and since that time should only reduce as execution progresses, processes will always run until they complete or a new process is added that requires a smaller amount of time.
+Thus the order of the execution of the above mentioned processes will be <img src="./Mp3-Scheduling_files/Bt5I8bW.png" alt=""></p>
+
+<h1 id="implementaion">Implementaion</h1>
+<h2 id="how-to-run-mp3">How to run mp3</h2>
+<p>Download <code class="language-plaintext highlighter-rouge">xv6-riscv</code> directory. 
+Pull docker image from Docker Hub</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker pull ntuos/mp3
+</code></pre></div></div>
+<p>Then, run the docker</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run -it -v $(pwd)/xv6-riscv:/home/xv6-riscv/ ntuos/mp3 /bin/bash
+</code></pre></div></div>
+
+<p>You have finished a user-level thread package in mp1, but function <code class="language-plaintext highlighter-rouge">schedule</code> was implemented by TA. In this mp, you are going to implement the algorithms described above.</p>
+
+<p>In mp1, we didn’t consider the time. If we want to implement those algorithms, we should have some functions that can count down the time and interrupt threads. Therefore, you have to implement 3 syscalls to achieve those goals. Their usage will be described below.</p>
+
+<p>After you finish the syscalls, you can move on to implement the scheduler. we will provide you <code class="language-plaintext highlighter-rouge">threads.c</code> and <code class="language-plaintext highlighter-rouge">threads.h</code>, every functions in <code class="language-plaintext highlighter-rouge">threads.c</code> will be implemented, and they will use the syscalls you implement. Since the schedule algorithm in our template is RR with time_quantum=1 time slot, you may modify <code class="language-plaintext highlighter-rouge">schedule()</code> for other algorithms. You can also modify other functions.</p>
+
+<h2 id="syscalls">Syscalls</h2>
+<h3 id="int-thrdstopint-ticks-int-thrdstop_context_id-void-thrdstop_handler"><strong>int thrdstop(int ticks, int thrdstop_context_id, void (*thrdstop_handler)());</strong></h3>
+
+<p>Primary usage of this syscall is:</p>
+<ol>
+  <li>If a program calls <code class="language-plaintext highlighter-rouge">thrdstop()</code>, after <code class="language-plaintext highlighter-rouge">ticks</code> ticks that this program consumes, switch to execute the <code class="language-plaintext highlighter-rouge">thrdstop_handler</code>. 
+After you switch to  <code class="language-plaintext highlighter-rouge">thrdstop_handler</code>  for the first time, you shouldn’t switch to it for the second time. The effect of this syscall just for one time.</li>
+  <li>Store the current program context according to <code class="language-plaintext highlighter-rouge">thrdstop_context_id</code>.
+<code class="language-plaintext highlighter-rouge">thrdstop_context_id</code> and return value will be described below.</li>
+</ol>
+
+<h4 id="a-invoke-the-handler">a. Invoke the handler</h4>
+<p>You’ll need to keep track of how many ticks have passed since the program calls <code class="language-plaintext highlighter-rouge">thrdstop()</code>; you may also need some attributes in <code class="language-plaintext highlighter-rouge">struct proc</code> to do this. We have defined some attributes for you. You can find them in <code class="language-plaintext highlighter-rouge">/kernel/proc.h</code>, we have marked them by <code class="language-plaintext highlighter-rouge">// for mp3</code>.</p>
+<ul>
+  <li>
+    <p><strong>int thrdstop_ticks;</strong>
+It should record how many ticks have passed since the program.</p>
+  </li>
+  <li>
+    <p><strong>int thrdstop_interval;</strong>
+It should store when we should switch to thrd_handler. You can just store <code class="language-plaintext highlighter-rouge">ticks</code>, argument of thrdstop.</p>
+  </li>
+  <li>
+    <p><strong>uint64 thrdstop_handler_pointer;</strong>
+It should store where we need to switch, You can just store <code class="language-plaintext highlighter-rouge">thrdstop_handler</code>, argument of thrdstop.</p>
+  </li>
+</ul>
+
+<p>Every tick passes, the hardware clock forces an interruption, which is handled by <code class="language-plaintext highlighter-rouge">usertrap()</code> and <code class="language-plaintext highlighter-rouge">kerneltrap()</code> in <code class="language-plaintext highlighter-rouge">kernel/trap.c</code> . You can find something like:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> if(which_dev == 2)
+ ...
+</code></pre></div></div>
+<p>You may do your jobs in that “if block”.</p>
+
+<h4 id="b-store-the-context">b. Store the context</h4>
+<p>Because this syscall will have program switch to <code class="language-plaintext highlighter-rouge">thrdstop_handler</code>, you should store the current program context. We have defined some attributes of <code class="language-plaintext highlighter-rouge">struct proc</code> for you to do this job. You can find them in <code class="language-plaintext highlighter-rouge">/kernel/proc.h</code>, we have marked them by <code class="language-plaintext highlighter-rouge">// for mp3</code>.</p>
+<ul>
+  <li>
+    <p><strong>  struct thrd_context_data thrdstop_context[MAX_THRD_NUM]</strong>
+You store the current context in this array, <code class="language-plaintext highlighter-rouge">struct thrd_context_data</code> is a bunch of <code class="language-plaintext highlighter-rouge">uint64</code> to store registers. You can find definition of <code class="language-plaintext highlighter-rouge">struct thrd_context_data</code> and <code class="language-plaintext highlighter-rouge">MAX_THRD_NUM</code> in <code class="language-plaintext highlighter-rouge">/kernel/proc.h</code></p>
+  </li>
+  <li>
+    <p><strong> int thrdstop_context_used[MAX_THRD_NUM];</strong>
+Indicated that <code class="language-plaintext highlighter-rouge">thrdstop_context[i]</code> is occupied or not. They will all be <code class="language-plaintext highlighter-rouge">0</code> at first.</p>
+  </li>
+  <li>
+    <p><strong> int thrdstop_context_id;</strong>
+When switch occurs, you should store the current context in <code class="language-plaintext highlighter-rouge">thrdstop_context[thrdstop_context_id]</code>.</p>
+  </li>
+</ul>
+
+<p>You need to find where is the current program context when you are in <code class="language-plaintext highlighter-rouge">if(which_dev == 2)</code> block. You can find the answer in <a href="https://pdos.csail.mit.edu/6.828/2020/xv6/book-riscv-rev1.pdf">xv6 book</a> chapter4. To simplify the problem, when you are in the <code class="language-plaintext highlighter-rouge">kerneltrap()</code>, the location of current program context is the same as the location when you are in the <code class="language-plaintext highlighter-rouge">usertrap()</code>. Moreover, what you do in <code class="language-plaintext highlighter-rouge">usertrap()</code>, just copy to corresponding location in <code class="language-plaintext highlighter-rouge">kerneltrap()</code>.</p>
+
+<p>The value of <code class="language-plaintext highlighter-rouge">thrdstop_context_id</code> is determined by <code class="language-plaintext highlighter-rouge">thrdstop()</code></p>
+<ol>
+  <li>If we call <code class="language-plaintext highlighter-rouge">thrdstop(n, -1, handler)</code>, you should find an empty slot in 
+<code class="language-plaintext highlighter-rouge">thrdstop_context[MAX_THRD_NUM]</code>. and store the empty slot index in <code class="language-plaintext highlighter-rouge">thrdstop_context_id</code>, then <code class="language-plaintext highlighter-rouge">thrdstop()</code> will return the empty slot index. Remember to set <code class="language-plaintext highlighter-rouge">thrdstop_context_used[index]</code> to <code class="language-plaintext highlighter-rouge">1</code>.
+If you can’t find an empty slot, return -1;</li>
+  <li>If we call <code class="language-plaintext highlighter-rouge">thrdstop(n, i, handler)</code>, it means that we want to store the current context in <code class="language-plaintext highlighter-rouge">thrdstop_context[i]</code>, set <code class="language-plaintext highlighter-rouge">thrdstop_context_id</code> as <code class="language-plaintext highlighter-rouge">i</code>, then <code class="language-plaintext highlighter-rouge">thrdstop()</code> will return <code class="language-plaintext highlighter-rouge">i</code>.</li>
+</ol>
+
+<h4 id="c-some-guarantees">c. Some guarantees</h4>
+<ol>
+  <li>We only call one <code class="language-plaintext highlighter-rouge">thrdstop</code> at the same time. For example
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>thrdstop(10, -1, handler1);
+thrdstop(10, -1, handler2);
+</code></pre></div>    </div>
+    <p>This won’t happen, you only need to keep track on one countdown at the same time.</p>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">int ticks</code> &gt; 0, argument of <code class="language-plaintext highlighter-rouge">thrdstop()</code></li>
+  <li><code class="language-plaintext highlighter-rouge">thrdstop_handler</code> must be some function of the program.</li>
+  <li>If you want to, you can add more attributes in <code class="language-plaintext highlighter-rouge">struct proc</code> or remove our attributes for mp3.  You can initialize your attributes in <code class="language-plaintext highlighter-rouge">allocproc()</code> in <code class="language-plaintext highlighter-rouge">/kernel/proc.c</code>.</li>
+</ol>
+
+<h3 id="int-thrdresumeint-thrdstop_context_id-int-is_exit"><strong>int thrdresume(int thrdstop_context_id, int is_exit);</strong></h3>
+<ol>
+  <li>If <code class="language-plaintext highlighter-rouge">is_exit</code> is zero, reload the context stored in <code class="language-plaintext highlighter-rouge">thrdstop_context[thrdstop_context_id]</code>, continue to execute that context.</li>
+  <li>If <code class="language-plaintext highlighter-rouge">is_exit</code> isn’t zero, then <code class="language-plaintext highlighter-rouge">thrdstop_context[thrdstop_context_id]</code> will become empty , and previous <code class="language-plaintext highlighter-rouge">thrdstop()</code> will be cancelled. For example:
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>thrdstop(10, -1, handler2);
+thrdresume(10, 1);
+</code></pre></div>    </div>
+    <p>In this case, <code class="language-plaintext highlighter-rouge">handler2</code> won’t be called, and <code class="language-plaintext highlighter-rouge">thrdstop_context_used[10]</code> should be set <code class="language-plaintext highlighter-rouge">0</code>. It is used for <code class="language-plaintext highlighter-rouge">thread_exit()</code></p>
+  </li>
+  <li>Return any value you want, we don’t use it.</li>
+</ol>
+
+<h4 id="some-guarantees">Some guarantees</h4>
+
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">0</code> &lt;= <code class="language-plaintext highlighter-rouge">thrdstop_context_id</code> &lt; <code class="language-plaintext highlighter-rouge">MAX_THRD_NUM</code></li>
+</ol>
+
+<h3 id="int-cancelthrdstop-int-thrdstop_context_id-"><strong>int cancelthrdstop( int thrdstop_context_id );</strong></h3>
+<p>This function cancels the <code class="language-plaintext highlighter-rouge">thrdstop()</code>.
+It also save the current thread context into <code class="language-plaintext highlighter-rouge">thrdstop_context[thrdstop_context_id]</code>, no need to store if thrdstop_context_id is -1.</p>
+
+<p>The return value is the time counted down by <code class="language-plaintext highlighter-rouge">thrdstop()</code>.
+That is, return <code class="language-plaintext highlighter-rouge">proc-&gt;thrdstop_ticks</code></p>
+<h4 id="some-guarantees-1">Some guarantees</h4>
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">0</code> &lt;= <code class="language-plaintext highlighter-rouge">thrdstop_context_id</code> &lt; <code class="language-plaintext highlighter-rouge">MAX_THRD_NUM</code> or <code class="language-plaintext highlighter-rouge">thrdstop_context_id == -1</code></li>
+</ol>
+
+<h3 id="test-the-syscalls">Test the syscalls</h3>
+<p>You can run <code class="language-plaintext highlighter-rouge">test1</code> in xv6. 
+Find the output, if “PASS 1” and “PASS 2” exist, then you pass the test.
+If you pass <code class="language-plaintext highlighter-rouge">test1</code>, you probably get the score of syscall part.</p>
+
+<h2 id="explanation-of-some-functions-in-template-code-in-threadc">Explanation of some functions in template code in thread.c</h2>
+<ul>
+  <li>
+    <p><strong>void thread_start_threading(int time_slot_size);</strong>
+This function starts threading and determine <code class="language-plaintext highlighter-rouge">time_slot_size</code>.<code class="language-plaintext highlighter-rouge">time_slot_size</code> indicates that <code class="language-plaintext highlighter-rouge">my_thrdstop_handler</code> will be called every <code class="language-plaintext highlighter-rouge">time_slot_size</code> ticks.
+<code class="language-plaintext highlighter-rouge">time_slot_size</code> is also basic time unit. Time quantum in RR must be integer times of <code class="language-plaintext highlighter-rouge">time_slot_size</code> in mp3.</p>
+  </li>
+  <li>
+    <p><strong>void my_thrdstop_handler(void);</strong>
+This function updates and checks the <code class="language-plaintext highlighter-rouge">remain_execution_time</code> of thread. <code class="language-plaintext highlighter-rouge">my_thrdstop_handler()</code> also directly calls <code class="language-plaintext highlighter-rouge">schedule()</code> for switching to next thread.</p>
+  </li>
+  <li>
+    <p><strong>struct thread <em>thread_create(void (</em>f)(void *), void *arg, int execution_time_slot);</strong>
+This function creates a thread object and does some initializations. <code class="language-plaintext highlighter-rouge">execution_time_slot</code> indicates that maximum  execution time of this thread is <code class="language-plaintext highlighter-rouge">time_slot_size * execution_time_slot</code> ticks. 
+When start threading, <code class="language-plaintext highlighter-rouge">thread-&gt;remain_execution_time</code> will be set to <code class="language-plaintext highlighter-rouge">time_slot_size * execution_time_slot</code>. 
+Threads may exit early, so its execution time can be less than <code class="language-plaintext highlighter-rouge">remain_execution_time</code>.</p>
+  </li>
+</ul>
+
+<h2 id="what-you-need-to-do-for-scheduler">What you need to do for scheduler</h2>
+
+<ul>
+  <li>
+    <p>FCFS:
+  Execute next thread when current thread exits.</p>
+  </li>
+  <li>Round Robin:
+    <ol>
+      <li>
+        <p>You should implement RR with time_quantum=3.</p>
+      </li>
+      <li>
+        <p>Execute the next thread when
+  (1) current thread exits. (determined by <code class="language-plaintext highlighter-rouge">thrd-&gt;is_exited</code>)
+  (2) current thread yields. (determined by <code class="language-plaintext highlighter-rouge">thrd-&gt;is_yield</code>)
+  (3) current thread has used up its time_quantum.</p>
+      </li>
+    </ol>
+  </li>
+  <li>
+    <p>SJF:</p>
+
+    <ol>
+      <li>Choose the next thread based on <code class="language-plaintext highlighter-rouge">remain_execution_time</code> (the shortest one ). 
+  If <code class="language-plaintext highlighter-rouge">remain_execution_time</code> is the same, choose the thread arived earlier. The arrival order is determined by <code class="language-plaintext highlighter-rouge">thread-&gt;ID</code> (the smaller the earlier).</li>
+      <li>Execute the next thread when
+  (1) current thread exits.
+  (2) current thread yields.</li>
+    </ol>
+  </li>
+</ul>
+
+<p><strong>UPDATE: Choose the first thread based on remain_execution_time.</strong></p>
+
+<ul>
+  <li>
+    <p>Preemptive SJF:</p>
+
+    <ol>
+      <li>Choose the next thread based on <code class="language-plaintext highlighter-rouge">remain_execution_time</code> (the shortest one ). 
+  If <code class="language-plaintext highlighter-rouge">remain_execution_time</code> is the same, choose the thread arived earlier. The arrival order is determined by <code class="language-plaintext highlighter-rouge">thread-&gt;ID</code> (the smaller the earlier).</li>
+      <li>Execute the next thread when
+  (1) current thread exits.
+  (2) current thread yields.
+  (3) current thread has been executed<code class="language-plaintext highlighter-rouge">time_slot_size</code> ticks.</li>
+    </ol>
+  </li>
+</ul>
+
+<p><strong>UPDATE: Choose the first thread based on remain_execution_time.</strong></p>
+
+<h2 id="test-the-scheduler">Test the scheduler</h2>
+
+<p>You can test your scheduler by those python files.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python3 grade-mp3-...
+</code></pre></div></div>
+<p>There’re 5 python files.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>grade-mp3-FCFS  grade-mp3-RR	 grade-mp3-default
+grade-mp3-PSJF  grade-mp3-SJF
+</code></pre></div></div>
+<p>The test tasks run by those python files are task1, task2 and task3.
+You can also run task1~3 in xv6.</p>
+
+<p><strong>UPDATE: grade-mp3-default is for the scheduler of sample code (RR with TQ==1) . </strong></p>
+
+<h2 id="explnation-of-task1">Explnation of task1</h2>
+
+<p><code class="language-plaintext highlighter-rouge">time_slot_size</code> is 5 ticks.
+t1 will yield at first.</p>
+
+<h3 id="1-rr-with-tq1-the-output-is">1. <strong>RR with tq=1, the output is:</strong></h3>
+
+<pre><code class="language-bash=">$ task1
+thread id 2 exec 35 ticks
+thread id 3 exec 40 ticks
+thread id 1 exec 45 ticks
+
+exited
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>maximum execution time</th>
+      <th>arrival time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="./Mp3-Scheduling_files/iqSh20L.png" alt=""></p>
+
+<h3 id="2-fcfs-the-output-is">2. <strong>FCFS, the output is:</strong></h3>
+
+<pre><code class="language-bash=">$ task1
+thread id 1 exec 15 ticks
+thread id 2 exec 30 ticks
+thread id 3 exec 45 ticks
+
+exited
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>maximum execution time</th>
+      <th>arrival time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="./Mp3-Scheduling_files/7nux2F3.png" alt=""></p>
+
+<h3 id="3-rr-with-tq3-the-output-is">3. <strong>RR with tq=3, the output is:</strong></h3>
+
+<pre><code class="language-bash=">$ task1
+thread id 2 exec 15 ticks
+thread id 3 exec 30 ticks
+thread id 1 exec 45 ticks
+
+exited
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>maximum execution time</th>
+      <th>arrival time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="./Mp3-Scheduling_files/fQqvHbh.png" alt=""></p>
+
+<h3 id="4-sjf-the-output-is">4. SJF, the output is:</h3>
+
+<pre><code class="language-bash=">$ task1
+thread id 1 exec 15 ticks
+thread id 2 exec 30 ticks
+thread id 3 exec 45 ticks
+
+exited
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>maximum execution time</th>
+      <th>arrival time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="./Mp3-Scheduling_files/7TUHhKW.png" alt=""></p>
+
+<h3 id="5-psjf-the-output-is">5. PSJF, the output is:</h3>
+
+<pre><code class="language-bash=">$ task1
+thread id 1 exec 15 ticks
+thread id 2 exec 30 ticks
+thread id 3 exec 45 ticks
+
+exited
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>maximum execution time</th>
+      <th>arrival time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="./Mp3-Scheduling_files/usrPntG.png" alt=""></p>
+
+<h2 id="explnation-of-task2">Explnation of task2</h2>
+
+<p><code class="language-plaintext highlighter-rouge">time_slot_size</code> is 5 ticks.</p>
+<ol>
+  <li>When thread1 is running and <code class="language-plaintext highlighter-rouge">uptime()-st1</code> &gt;= <code class="language-plaintext highlighter-rouge">2</code>, thread1 will yield once. <code class="language-plaintext highlighter-rouge">st1</code> is the time when thread1 started.</li>
+  <li>When thread1 have yielded and <code class="language-plaintext highlighter-rouge">uptime()-st1</code> &gt;= <code class="language-plaintext highlighter-rouge">7</code>,, thread1 will create thread3. <code class="language-plaintext highlighter-rouge">st1</code> is the time when thread1 started.</li>
+</ol>
+
+<h3 id="1-rr-with-tq1-the-output-is-1">1. <strong>RR with tq=1, the output is:</strong></h3>
+
+<pre><code class="language-bash=">$ task2
+thread id 2 exec 32 ticks
+thread id 1 exec 40 ticks
+thread id 3 exec 38 ticks
+
+exited
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>maximum execution time</th>
+      <th>arrival time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>7</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="./Mp3-Scheduling_files/ACbIGLY.png" alt=""></p>
+
+<h3 id="2-fcfs-the-output-is-1">2. <strong>FCFS, the output is:</strong></h3>
+
+<pre><code class="language-bash=">$ task2
+thread id 1 exec 15 ticks
+thread id 2 exec 30 ticks
+thread id 3 exec 38 ticks
+
+exited
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>maximum execution time</th>
+      <th>arrival time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>7</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="./Mp3-Scheduling_files/mwUzoK5.png" alt=""></p>
+
+<h3 id="3-rr-with-tq3-the-output-is-1">3. <strong>RR with tq=3, the output is:</strong></h3>
+
+<pre><code class="language-bash=">$ task2
+thread id 2 exec 17 ticks
+thread id 1 exec 30 ticks
+thread id 3 exec 28 ticks
+
+exited
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>maximum execution time</th>
+      <th>arrival time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>3 time slot (15 ticks)</td>
+      <td><font color="#f00">17</font></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="./Mp3-Scheduling_files/HHtqaqy.png" alt=""></p>
+
+<h3 id="4-sjf-the-output-is-1">4. SJF, the output is:</h3>
+
+<pre><code class="language-bash=">$ task2
+thread id 1 exec 15 ticks
+thread id 2 exec 30 ticks
+thread id 3 exec 38 ticks
+
+exited
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>maximum execution time</th>
+      <th>arrival time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>7</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="./Mp3-Scheduling_files/6fLUnP7.png" alt=""></p>
+
+<h3 id="5-psjf-the-output-is-1">5. PSJF, the output is:</h3>
+
+<pre><code class="language-bash=">$ task2
+thread id 1 exec 15 ticks
+thread id 2 exec 30 ticks
+thread id 3 exec 38 ticks
+
+exited
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>maximum execution time</th>
+      <th>arrival time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>3 time slot (15 ticks)</td>
+      <td>7</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="./Mp3-Scheduling_files/25UWCEs.png" alt=""></p>
+
+<h2 id="explnation-of-task3">Explnation of task3</h2>
+
+<p><code class="language-plaintext highlighter-rouge">time_slot_size</code> is 3 ticks.</p>
+<ol>
+  <li>When thread1 is running and <code class="language-plaintext highlighter-rouge">uptime()-st1</code> &gt;= <code class="language-plaintext highlighter-rouge">2</code>, thread1 will create thread3. <code class="language-plaintext highlighter-rouge">st1</code> is the time when thread1 started.</li>
+</ol>
+
+<h3 id="1-rr-with-tq1-the-output-is-2">1. <strong>RR with tq=1, the output is:</strong></h3>
+
+<pre><code class="language-bash=">$ task3
+thread id 3 exec 7 ticks
+thread id 1 exec 18 ticks
+thread id 2 exec 24 ticks
+
+exited
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>maximum execution time</th>
+      <th>arrival time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>3 time slot (9 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>4 time slot (12 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>1 time slot (3 ticks)</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="./Mp3-Scheduling_files/bO4Lstj.png" alt=""></p>
+
+<h3 id="2-fcfs-the-output-is-2">2. <strong>FCFS, the output is:</strong></h3>
+
+<pre><code class="language-bash=">$ task3
+thread id 1 exec 9 ticks
+thread id 2 exec 21 ticks
+thread id 3 exec 22 ticks
+
+exited
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>maximum execution time</th>
+      <th>arrival time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>3 time slot (9 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>4 time slot (12 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>1 time slot (3 ticks)</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="./Mp3-Scheduling_files/cXOkMHn.png" alt=""></p>
+
+<h3 id="3-rr-with-tq3-the-output-is-2">3. <strong>RR with tq=3, the output is:</strong></h3>
+
+<pre><code class="language-bash=">$ task3
+thread id 1 exec 9 ticks
+thread id 3 exec 19 ticks
+thread id 2 exec 24 ticks
+
+exited
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>maximum execution time</th>
+      <th>arrival time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>3 time slot (9 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>4 time slot (12 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>1 time slot (3 ticks)</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="./Mp3-Scheduling_files/6qKr5qn.png" alt=""></p>
+
+<h3 id="4-sjf-the-output-is-2">4. SJF, the output is:</h3>
+
+<pre><code class="language-bash=">$ task3
+thread id 1 exec 9 ticks
+thread id 3 exec 10 ticks
+thread id 2 exec 24 ticks
+
+exited
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>maximum execution time</th>
+      <th>arrival time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>3 time slot (9 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>4 time slot (12 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>1 time slot (3 ticks)</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="./Mp3-Scheduling_files/iI2IyjB.png" alt=""></p>
+
+<h3 id="5-psjf-the-output-is-2">5. PSJF, the output is:</h3>
+
+<pre><code class="language-bash=">$ task3
+thread id 3 exec 4 ticks
+thread id 1 exec 12 ticks
+thread id 2 exec 24 ticks
+
+exited
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>maximum execution time</th>
+      <th>arrival time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>3 time slot (9 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>4 time slot (12 ticks)</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>1 time slot (3 ticks)</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="./Mp3-Scheduling_files/SWr23bM.png" alt=""></p>
+
+<h1 id="grading">Grading</h1>
+
+<ul>
+  <li>Syscalls: 10%</li>
+  <li>FCFS: 15%</li>
+  <li>RR: 15%</li>
+  <li>SJF: 20%</li>
+  <li>PSJF: 20%</li>
+  <li>Report: 20%
+    <ol>
+      <li>Explain how you implement 3 syscalls. (9%)</li>
+      <li>When you switch to the <code class="language-plaintext highlighter-rouge">thrdstop_handler</code>, what context do you store? Is it redundant to store all callee and caller registers? <strong>UPDATE: Explain your reason</strong>(6%)</li>
+      <li>Take a look at <code class="language-plaintext highlighter-rouge">struct context</code> in <code class="language-plaintext highlighter-rouge">/kernel/proc.h</code>. In context switching for processes, why does it only save callee registers and the ra register? (5%)</li>
+    </ol>
+  </li>
+</ul>
+
+<h1 id="how-to-submit">How to submit</h1>
+
+<p>Submit report in gradescope.
+Add 1 directory <code class="language-plaintext highlighter-rouge">myAns</code> in <code class="language-plaintext highlighter-rouge">xv6-riscv</code> .
+<code class="language-plaintext highlighter-rouge">myAns</code> should contain 3 directories, <code class="language-plaintext highlighter-rouge">kernel</code>, <code class="language-plaintext highlighter-rouge">user</code>, <code class="language-plaintext highlighter-rouge">SOL</code>
+Then push them to github class</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>xv6-riscv/
+├── myAns
+│&nbsp;&nbsp; ├── kernel
+│&nbsp;&nbsp; │&nbsp;&nbsp; ├── ...
+...
+│&nbsp;&nbsp; └── user
+│&nbsp;&nbsp;     ├── ...
+...
+│   ├── SOL
+│   │   ├── FCFS
+│   │   │   ├── threads.c
+│   │   │   └── threads.h
+│   │   ├── PSJF
+│   │   │   ├── threads.c
+│   │   │   └── threads.h
+│   │   ├── RR
+│   │   │   ├── threads.c
+│   │   │   └── threads.h
+│   │   └── SJF
+│   │       ├── threads.c
+│   │       └── threads.h
+└── ...
+|
+....
+</code></pre></div></div>
+
+<p>When we test your implementation</p>
+
+<p>1.We will replace the <code class="language-plaintext highlighter-rouge">kernel</code> and <code class="language-plaintext highlighter-rouge">user</code> in <code class="language-plaintext highlighter-rouge">xv6-riscv</code> with your <code class="language-plaintext highlighter-rouge">kernel</code> and <code class="language-plaintext highlighter-rouge">user</code>.</p>
+<ol>
+  <li>Copy the corresponding <code class="language-plaintext highlighter-rouge">thread.h</code>, <code class="language-plaintext highlighter-rouge">thread.c</code> to <code class="language-plaintext highlighter-rouge">xv6-riscv/user/thread.h</code>, <code class="language-plaintext highlighter-rouge">xv6-riscv/user/thread.c</code></li>
+  <li>In order to add some test files, we will use the our Makefile. Therefore, you shouldn’t remove or add  files in <code class="language-plaintext highlighter-rouge">kernel</code> and <code class="language-plaintext highlighter-rouge">user</code>.</li>
+  <li>You should check that you can compile successfully with original Makefile.</li>
+</ol>
+
+<h1 id="early-bird-5">Early Bird (5%)</h1>
+
+<ol>
+  <li>Finish the <strong>coding part</strong> before 5/18 23:59, and it should be a correct solution.  No early bird bonus for an incorrect answer.</li>
+  <li>We’ll announce the grade in 1 day. You can submit again after we grade the early bird.</li>
+  <li>We will choose the higher one, if you submit for early bird and normal deadline.</li>
+</ol>
+
+<h1 id="office-hour">Office Hour</h1>
+
+<h4 id="513-17001800">5/13 17:00~18:00</h4>
+<h4 id="518-17001800">5/18 17:00~18:00</h4>
+<h4 id="520-17001800">5/20 17:00~18:00</h4>
+<h4 id="資工540">資工540</h4>
+
+
+      <footer class="site-footer">
+        
+          <p class="copyright">Operating System 2021 Machine Problem Site maintained by <a href="https://github.com/OperatingSystemsAtNTU">OperatingSystemsAtNTU</a></p>
+        
+      </footer>
+    </main>
+  
+
+
+</body></html>
